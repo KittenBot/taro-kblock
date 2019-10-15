@@ -1,10 +1,20 @@
 import Taro from '@tarojs/taro'
 import { View, Picker, PickerView, PickerViewColumn, Image } from '@tarojs/components'
 import { AtButton, AtGrid, AtInput } from 'taro-ui'
-import DocsHeader from '../components/doc-header'
-import './index.scss'
+import { connect } from '@tarojs/redux'
 
-export default class MicroBitPage extends Taro.Component {
+import './index.scss'
+import { bleScan } from '../../reducers/ble'
+
+@connect(({ ble }) => ({
+  ble
+}), (dispatch) => ({
+  bleScan (state) {
+    console.log("ble scan", state)
+    dispatch(bleScan(state))
+  }
+}))
+class MicroBitPage extends Taro.Component {
   config = {
     navigationBarTitleText: 'Micro:Bit'
   }
@@ -52,6 +62,7 @@ export default class MicroBitPage extends Taro.Component {
     this.setState({
       value
     })
+    this.props.bleScan(!this.props.ble.isScanning);
     // 在小程序中，如果想改变 value 的值，需要 `return value` 从而改变输入框的当前值
     return value
   }
@@ -59,7 +70,8 @@ export default class MicroBitPage extends Taro.Component {
   render () {
     return (
       <View className='page'>
-        <View className='page-title'>矩阵屏幕</View>
+        <View className='page-title'>{this.props.ble.isScanning ? "Yes" : "No"}</View>
+        <View className='page-title'>矩阵屏幕:{this.props.ble.isScanning}</View>
         <View className='page-item'>
           <View className='led-wrap'>
             <AtGrid columnNum={5} data={this.state.led} />
@@ -79,7 +91,7 @@ export default class MicroBitPage extends Taro.Component {
             clear
             title='文字'
             type='text'
-            maxLength='4'
+            maxLength='10'
             placeholder='abcd'
             value={this.state.value}
             onChange={this.handleChange.bind(this)}
@@ -87,10 +99,13 @@ export default class MicroBitPage extends Taro.Component {
             <AtButton type='secondary' circle={true} size='normal'>发送</AtButton>
           </AtInput>
         </View>
+        <View className='page-title'>读取按键</View>
+        <View className='page-title'>读取陀螺仪</View>
         <View className='page-title'>播放音符</View>
-        <View className='page-title'>播放音符</View>
-        
+        <View className='page-title'>读取陀螺仪</View>
+
       </View>
     )
   }
 }
+export default MicroBitPage;

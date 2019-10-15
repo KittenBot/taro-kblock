@@ -1,8 +1,9 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Text, Image, Swiper, SwiperItem } from '@tarojs/components'
+
 import './index.scss'
 
-export default class Index extends Component {
+class Index extends Component {
 
   config = {
     navigationBarTitleText: '首页'
@@ -121,3 +122,4 @@ export default class Index extends Component {
     )
   }
 }
+export default Index
