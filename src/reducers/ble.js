@@ -2,7 +2,14 @@
 const BLE_SCAN = 'BLE_SCAN'
 
 const INITIAL_STATE = {
-  isScanning: false
+  isScanning: false,
+  devices: [
+    {
+      name: "test",
+      uuid: 12345
+    }
+  ],
+  connectedDev: null
 }
 
 function counter (state = INITIAL_STATE, action) {

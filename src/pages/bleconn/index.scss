@@ -1,0 +1,37 @@
+@import "../../assets/css/theme.scss";
+
+.page {
+  position: relative;
+  background-color: #FDFDFD;
+
+  .logo{
+    width: 200px
+  }
+
+  view,
+  div {
+    box-sizing: border-box;
+  }
+
+  .found-txt {
+    font-size: 16px;
+    padding: 0 30px;
+  }
+
+  .page-title {
+    margin-top: 24px;
+    color: #474747;
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .page-item {
+    padding: 40px;
+  }
+
+  .led-wrap{
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+}
