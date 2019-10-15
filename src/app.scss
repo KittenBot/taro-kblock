@@ -1,11 +1,15 @@
+@import "./assets/css/theme.scss";
+@import "~taro-ui/dist/style/index.scss";
+@import "./assets/font-awesome/font-awesome.scss";
+@import "./assets/font/iconfont.scss";
+
 .page {
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    min-height: 100vh;
-  }
-  
-  view {
-    box-sizing: border-box;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+view {
+  box-sizing: border-box;
+}

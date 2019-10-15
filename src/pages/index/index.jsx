@@ -70,6 +70,14 @@ export default class Index extends Component {
 
   componentDidHide () { }
 
+  gotoPanel = e => {
+    const { id } = e.currentTarget.dataset
+    Taro.navigateTo({
+      // url: `/pages/panel/index?id=${id.toLowerCase()}`
+      url: `/pages/${id.toLowerCase()}/index`
+    })
+  }
+
   render () {
     return (
       <View className='page page-index'>
