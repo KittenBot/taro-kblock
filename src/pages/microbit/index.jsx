@@ -77,10 +77,12 @@ class MicroBitPage extends Taro.Component {
     return (
       <View className='page'>
         <View className='page-item'>
-          <View
+          {this.props.ble.connected ? <View>
+            已连接{this.props.ble.connected.name}
+          </View> : <View
             className='ble-goto-btn'
             onClick={this.handleGoBle.bind(this)}
-          >请先连接蓝牙</View>
+          >请先连接蓝牙</View>}
         </View>
         <View className='page-title'>矩阵屏幕:{this.props.ble.isScanning}</View>
         <View className='page-item'>

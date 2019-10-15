@@ -1,5 +1,8 @@
-
+const BLE_SET_DEVS = 'BLE_SET_DEVS'
 const BLE_SCAN = 'BLE_SCAN'
+const BLE_CONNECTED = 'BLE_CONNECTED'
+const BLE_CHAR_WRITE = 'BLE_CHAR_WRITE'
+const BLE_CHAR_READ = 'BLE_CHAR_READ'
 
 const INITIAL_STATE = {
   isScanning: false,
@@ -9,7 +12,9 @@ const INITIAL_STATE = {
       uuid: 12345
     }
   ],
-  connectedDev: null
+  connected: null,
+  charWrite: null,
+  charRead: null
 }
 
 function counter (state = INITIAL_STATE, action) {
@@ -18,6 +23,26 @@ function counter (state = INITIAL_STATE, action) {
       return {
         ...state,
         isScanning: action.scanning
+      }
+    case BLE_SET_DEVS:
+      return {
+        ...state,
+        devices: action.devices
+      }
+    case BLE_CONNECTED:
+      return {
+        ...state,
+        connected: action.dev
+      }
+    case BLE_CHAR_WRITE:
+      return {
+        ...state,
+        charWrite: action.char
+      }
+    case BLE_CHAR_READ:
+      return {
+        ...state,
+        charRead: action.char
       }
     default:
       return state
@@ -32,7 +57,40 @@ const bleScan = (state) => {
   }
 }
 
+const setDevices = (devices) => {
+  return {
+    type: BLE_SET_DEVS,
+    devices: devices
+  }
+}
+
+const bleConnected = (dev) => {
+  return {
+    type: BLE_CONNECTED,
+    devices: dev
+  }
+}
+
+const bleCharWrite = (char) => {
+  return {
+    type: BLE_CHAR_WRITE,
+    char
+  }
+}
+
+const bleCharRead= (char) => {
+  return {
+    type: BLE_CHAR_READ,
+    char
+  }
+}
+
+
 export {
   counter as default,
   bleScan,
+  setDevices,
+  bleConnected,
+  bleCharWrite,
+  bleCharRead
 }
