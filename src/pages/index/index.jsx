@@ -82,7 +82,7 @@ class Index extends Component {
   render () {
     return (
       <View className='page page-index'>
-        <View className='caro'>
+        {/*<View className='caro'>
           <Swiper
             indicatorColor='#999'
             indicatorActiveColor='#333'
@@ -102,7 +102,7 @@ class Index extends Component {
               ))
             }
           </Swiper>
-        </View>
+          </View>*/}
         <View className='module-list'>
           {this.state.pages.map((item, index) => (
             <View

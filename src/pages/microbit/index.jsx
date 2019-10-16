@@ -270,6 +270,8 @@ const pixelImage = {
 };
 
 const btnEnum = ['None', 'A', 'B', 'A+B']
+const gesMenu = ['up', 'down', 'left', 'right', 'face up', 'face down', 'freefall', '3g', '6g', '8g', 'shake'];
+const noteFreq = ['261','294','327','348','392','436','490','523'];
 
 function matStr2ary (mat){
   return mat.trim().replace(/\n/g, '').replace(/ /g, '').replace(/#/g, '1');
@@ -442,7 +444,8 @@ class MicroBitPage extends Taro.Component {
   }
 
   onSendNote (note){
-    console.log("send note", note)
+    const freq = noteFreq[note]
+    this.send(`M11 ${freq} 500\n`);
   }
 
   render () {
@@ -495,17 +498,17 @@ class MicroBitPage extends Taro.Component {
         <AtSwitch className='page-item' title='打开按键提示' checked={this.state.isButtonNotify} onChange={this.onToggleButtonNotify.bind(this)} />
         <View className='page-title'>播放音符</View>
         <View className='note-btns'>
-          <AtButton size='small' circle onClick={()=>this.onSendNote('do')}>Do</AtButton>
-          <AtButton size='small' circle onClick={()=>this.onSendNote('re')}>Re</AtButton>
-          <AtButton size='small' circle onClick={()=>this.onSendNote('mi')}>Mi</AtButton>
-          <AtButton size='small' circle onClick={()=>this.onSendNote('fa')}>Fa</AtButton>
-          <AtButton size='small' circle onClick={()=>this.onSendNote('so')}>So</AtButton>
-          <AtButton size='small' circle onClick={()=>this.onSendNote('ra')}>Ra</AtButton>
-          <AtButton size='small' circle onClick={()=>this.onSendNote('xi')}>Xi</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote(0)}>Do</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote(1)}>Re</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote(2)}>Mi</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote(3)}>Fa</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote(4)}>So</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote(5)}>Ra</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote(6)}>Xi</AtButton>
         </View>
         <View className='page-title'>读取陀螺仪</View>
         <View className='page-item'>
-          <View className='imu-txt'>{`姿态: ${this.state.gesValue}`}</View>
+          <View className='imu-txt'>{`姿态: ${gesMenu[this.state.gesValue - 1]}`}</View>
           <View className='imu-txt'>{`X:${this.state.accX} Y:${this.state.accY} Z:${this.state.accZ}`}</View>
         </View>
         
