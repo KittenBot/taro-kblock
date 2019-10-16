@@ -34,12 +34,28 @@ class RobotBitPage extends Taro.Component {
       accX: 0,
       accY: 0,
       accZ: 0,
+      speed: [0,0,0,0],
+      degree: [90,90,90,90,90,90,90,90]
     }
     this.bleWrite = this.bleWrite.bind(this);
     this.send = this.send.bind(this);
     this.onSetMotorSpeed = this.onSetMotorSpeed.bind(this);
 
     this.lineBuffer = '';
+  }
+
+  componentDidMount () { 
+    Taro.onBLEConnectionStateChange(res => {
+      // 该方法回调中可以用于处理连接意外断开等异常情况
+      // console.log(`device ${res.deviceId} state has changed, connected: ${res.connected}`)
+      if (this.props.ble.connected && this.props.ble.connected.deviceId == res.deviceId && !res.connected){
+        Taro.atMessage({
+          'message': '蓝牙连接断开',
+          'type': 'warning',
+        })
+        this.props.bleConnected(null);
+      }
+    })
   }
 
 
@@ -111,13 +127,24 @@ class RobotBitPage extends Taro.Component {
 
   onSetMotorSpeed (idx, value){
     console.log("motor", idx, value)
+    this.send(`M21 ${idx+1} ${value} 3000\n`);
+    const speed = this.state.speed;
+    speed[idx] = value;
+    this.setState({speed})
   }
 
   onSetServoDeg (idx, deg){
     console.log("servo", idx, deg)
+    this.send(`M24 ${idx} ${deg} 0\n`);
+    const degree = this.state.degree;
+    degree[idx] = deg;
+    this.setState({degree})
   }
 
   render () {
+    const speed=this.state.speed;
+    const degree=this.state.degree;
+
     return (
       <View className='page'>
         <AtMessage />
@@ -131,21 +158,21 @@ class RobotBitPage extends Taro.Component {
         </View>
         <View className='page-title'>马达控制</View>
         <View className='page-item'>
-          <AtSlider min={-255} max={255} step={1} showValue onChange={e => this.onSetMotorSpeed(0, e.value)} />
-          <AtSlider min={-255} max={255} step={1} showValue onChange={e => this.onSetMotorSpeed(1, e.value)} />
-          <AtSlider min={-255} max={255} step={1} showValue onChange={e => this.onSetMotorSpeed(2, e.value)} />
-          <AtSlider min={-255} max={255} step={1} showValue onChange={e => this.onSetMotorSpeed(3, e.value)} />
+          <AtSlider min={-255} max={255} step={1} value={speed[0]} showValue onChange={e => this.onSetMotorSpeed(0, e.value)} />
+          <AtSlider min={-255} max={255} step={1} value={speed[1]} showValue onChange={e => this.onSetMotorSpeed(1, e.value)} />
+          <AtSlider min={-255} max={255} step={1} value={speed[2]} showValue onChange={e => this.onSetMotorSpeed(2, e.value)} />
+          <AtSlider min={-255} max={255} step={1} value={speed[3]} showValue onChange={e => this.onSetMotorSpeed(3, e.value)} />
         </View>
         <View className='page-title'>舵机控制</View>
         <View className='page-item'>
-          <AtSlider min={0} max={180} step={1} showValue onChange={e => this.onSetServoDeg(0, e.value)} />
-          <AtSlider min={0} max={180} step={1} showValue onChange={e => this.onSetServoDeg(1, e.value)} />
-          <AtSlider min={0} max={180} step={1} showValue onChange={e => this.onSetServoDeg(2, e.value)} />
-          <AtSlider min={0} max={180} step={1} showValue onChange={e => this.onSetServoDeg(3, e.value)} />
-          <AtSlider min={0} max={180} step={1} showValue onChange={e => this.onSetServoDeg(4, e.value)} />
-          <AtSlider min={0} max={180} step={1} showValue onChange={e => this.onSetServoDeg(5, e.value)} />
-          <AtSlider min={0} max={180} step={1} showValue onChange={e => this.onSetServoDeg(6, e.value)} />
-          <AtSlider min={0} max={180} step={1} showValue onChange={e => this.onSetServoDeg(7, e.value)} />
+          <AtSlider min={0} max={180} step={1} value={degree[0]} showValue onChange={e => this.onSetServoDeg(0, e.value)} />
+          <AtSlider min={0} max={180} step={1} value={degree[1]} showValue onChange={e => this.onSetServoDeg(1, e.value)} />
+          <AtSlider min={0} max={180} step={1} value={degree[2]} showValue onChange={e => this.onSetServoDeg(2, e.value)} />
+          <AtSlider min={0} max={180} step={1} value={degree[3]} showValue onChange={e => this.onSetServoDeg(3, e.value)} />
+          <AtSlider min={0} max={180} step={1} value={degree[4]} showValue onChange={e => this.onSetServoDeg(4, e.value)} />
+          <AtSlider min={0} max={180} step={1} value={degree[5]} showValue onChange={e => this.onSetServoDeg(5, e.value)} />
+          <AtSlider min={0} max={180} step={1} value={degree[6]} showValue onChange={e => this.onSetServoDeg(6, e.value)} />
+          <AtSlider min={0} max={180} step={1} value={degree[7]} showValue onChange={e => this.onSetServoDeg(7, e.value)} />
         </View>
 
       </View>

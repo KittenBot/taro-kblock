@@ -1,6 +1,7 @@
 const BLE_SET_DEVS = 'BLE_SET_DEVS'
 const BLE_SCAN = 'BLE_SCAN'
 const BLE_CONNECTED = 'BLE_CONNECTED'
+const BLE_DISCONNECT = 'BLE_DISCONNECT'
 const BLE_CHAR_WRITE = 'BLE_CHAR_WRITE'
 const BLE_CHAR_READ = 'BLE_CHAR_READ'
 
@@ -30,6 +31,13 @@ function counter (state = INITIAL_STATE, action) {
         ...state,
         connected: action.dev
       }
+    case BLE_DISCONNECT:
+        return {
+          ...state,
+          connected: null,
+          charWrite: null,
+          charRead: null
+        }
     case BLE_CHAR_WRITE:
       return {
         ...state,
@@ -61,6 +69,9 @@ const setDevices = (devices) => {
 }
 
 const bleConnected = (dev) => {
+  if (!dev){
+    return {type: BLE_DISCONNECT}
+  }
   return {
     type: BLE_CONNECTED,
     dev: dev

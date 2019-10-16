@@ -299,7 +299,7 @@ class MicroBitPage extends Taro.Component {
       matrix: matStr2ary(pixelImage.HEART).split(''),
       images: Object.keys(pixelImage),
       matText: '',
-      isButtonNotify: false,
+      isButtonNotify: true,
       btnValue: 0,
       gesValue: 0,
       touchValue: 0,
@@ -364,19 +364,19 @@ class MicroBitPage extends Taro.Component {
   }
 
   componentWillUnmount () { 
-    if (this.props.ble.connected){
-      console.log("close ble", this.props.ble.connected.deviceId);
-      Taro.closeBLEConnection({
-        deviceId: this.props.ble.connected.deviceId
-      }).then(ret => {
-        this.props.bleConnected(null);
-        Taro.closeBluetoothAdapter()
-      })
-    }
+    // if (this.props.ble.connected){
+    //   console.log("close ble", this.props.ble.connected.deviceId);
+    //   Taro.closeBLEConnection({
+    //     deviceId: this.props.ble.connected.deviceId
+    //   }).then(ret => {
+    //     this.props.bleConnected(null);
+    //     Taro.closeBluetoothAdapter()
+    //   })
+    // }
   }
 
   bleWrite (str){
-    console.log("ble write", str);
+    // console.log("ble write", str);
     const data = str2ab(str);
     const wc = this.props.ble.charWrite;
     if (wc){
