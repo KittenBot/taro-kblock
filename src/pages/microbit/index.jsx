@@ -289,7 +289,8 @@ class MicroBitPage extends Taro.Component {
     super(...arguments)
     this.state = {
       matrix: matStr2ary(pixelImage.HEART).split(''),
-      images: ['hear', 'small-heart']
+      images: Object.keys(pixelImage),
+      matText: ''
     }
   }
 
@@ -299,11 +300,10 @@ class MicroBitPage extends Taro.Component {
     })
   }
 
-  handleChange (value) {
+  onChangeMatText (value) {
     this.setState({
-      value
+      matText: value
     })
-    this.props.bleScan(!this.props.ble.isScanning);
     // 在小程序中，如果想改变 value 的值，需要 `return value` 从而改变输入框的当前值
     return value
   }
@@ -322,6 +322,19 @@ class MicroBitPage extends Taro.Component {
       mat[idx] = '1'
     }
     this.setState({matrix: mat})
+  }
+
+  onPickLedImg (e){
+    const idx = e.detail.value;
+    const img = pixelImage[this.state.images[idx]];
+    this.setState({
+      matrix: matStr2ary(img).split(''),
+    })
+
+  }
+
+  onSendText (){
+    console.log("send text", this.state.matText)
   }
 
   render () {
@@ -350,9 +363,9 @@ class MicroBitPage extends Taro.Component {
         </View>
         <View className='page-title'>显示图案</View>
         <View className='page-item'>
-          <Picker mode='selector' range={this.state.images} value={this.state.selectorValue} onChange={this.handlePickerChange.bind(this)}>
+          <Picker mode='selector' range={this.state.images} onChange={this.onPickLedImg.bind(this)}>
             <View className='demo-list-item'>
-              <View className='demo-list-item__label'>国家地区</View>
+              <View className='demo-list-item__label'>点我打开图案列表</View>
             </View>
           </Picker>
         </View>
@@ -364,17 +377,15 @@ class MicroBitPage extends Taro.Component {
             type='text'
             maxLength='10'
             placeholder='abcd'
-            value={this.state.value}
-            onChange={this.handleChange.bind(this)}
+            value={this.state.matText}
+            onChange={this.onChangeMatText.bind(this)}
           >
-            <AtButton type='secondary' circle={true} size='normal'>发送</AtButton>
+            <AtButton type='secondary' circle={true} size='normal' onClick={this.onSendText.bind(this)}>发送</AtButton>
           </AtInput>
         </View>
         <View className='page-title'>读取按键</View>
         <View className='page-title'>读取陀螺仪</View>
         <View className='page-title'>播放音符</View>
-        <View className='page-title'>读取陀螺仪</View>
-
       </View>
     )
   }
