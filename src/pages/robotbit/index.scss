@@ -1,0 +1,25 @@
+@import "../../assets/css/theme.scss";
+
+.page {
+  position: relative;
+  background-color: #FDFDFD;
+
+  view,
+  div {
+    box-sizing: border-box;
+  }
+
+  .page-title {
+    margin-top: 24px;
+    color: #474747;
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .page-item {
+    padding: 40px;
+
+  }
+
+}

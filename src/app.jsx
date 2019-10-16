@@ -18,6 +18,7 @@ class App extends Component {
     pages: [
       'pages/index/index',
       'pages/microbit/index',
+      'pages/robotbit/index',
       'pages/bleconn/index',
     ],
     window: {

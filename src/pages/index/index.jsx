@@ -28,31 +28,6 @@ class Index extends Component {
           title: 'Iot',
           content: 'Iot 面板',
         },
-        {
-          id: 'nanobit',
-          title: 'Nano:Bit',
-          content: 'Nanobit Io 与oled',
-        },
-        {
-          id: 'microbit',
-          title: 'Micro:bit',
-          content: 'Microbit 控制',
-        },
-        {
-          id: 'robotbit',
-          title: 'Robot:Bit',
-          content: 'Robotbit 遥控',
-        },
-        {
-          id: 'iot',
-          title: 'Iot',
-          content: 'Iot 面板',
-        },
-        {
-          id: 'nanobit',
-          title: 'Nano:Bit',
-          content: 'Nanobit Io 与oled',
-        },
       ],
       imgUrls: [
         'https://img10.360buyimg.com/babel/s700x360_jfs/t25855/203/725883724/96703/5a598a0f/5b7a22e1Nfd6ba344.jpg!q90!cc_350x180',
