@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro'
 import { View, Picker, PickerView, PickerViewColumn, Image } from '@tarojs/components'
-import { AtButton, AtGrid, AtInput } from 'taro-ui'
+import { AtButton, AtGrid, AtInput, AtSwitch  } from 'taro-ui'
 import { connect } from '@tarojs/redux'
 
 import './index.scss'
@@ -290,8 +290,14 @@ class MicroBitPage extends Taro.Component {
     this.state = {
       matrix: matStr2ary(pixelImage.HEART).split(''),
       images: Object.keys(pixelImage),
-      matText: ''
+      matText: '',
+      isButtonNotify: false,
+      imuPos: '',
+      imuX: 0,
+      imuY: 0,
+      imuZ: 0
     }
+    this.onSendNote = this.onSendNote.bind(this);
   }
 
   handlePickerChange (e) {
@@ -337,6 +343,16 @@ class MicroBitPage extends Taro.Component {
     console.log("send text", this.state.matText)
   }
 
+  onToggleButtonNotify (){
+    this.setState({
+      isButtonNotify: !this.state.isButtonNotify
+    })
+  }
+
+  onSendNote (note){
+    console.log("send note", note)
+  }
+
   render () {
     // map matrix str to at grid info
     let gridInfo = [];
@@ -370,22 +386,36 @@ class MicroBitPage extends Taro.Component {
           </Picker>
         </View>
         <View className='page-title'>显示文字</View>
-        <View className='page-item'>
-          <AtInput
-            clear
-            title='文字'
-            type='text'
-            maxLength='10'
-            placeholder='abcd'
-            value={this.state.matText}
-            onChange={this.onChangeMatText.bind(this)}
-          >
-            <AtButton type='secondary' circle={true} size='normal' onClick={this.onSendText.bind(this)}>发送</AtButton>
-          </AtInput>
-        </View>
+        <AtInput
+          clear
+          className='page-item'
+          title='文字'
+          type='text'
+          maxLength='10'
+          placeholder='abcd'
+          value={this.state.matText}
+          onChange={this.onChangeMatText.bind(this)}
+        >
+          <AtButton type='secondary' circle={true} size='normal' onClick={this.onSendText.bind(this)}>发送</AtButton>
+        </AtInput>
         <View className='page-title'>读取按键</View>
-        <View className='page-title'>读取陀螺仪</View>
+        <AtSwitch className='page-item' title='打开按键提示' checked={this.state.isButtonNotify} onChange={this.onToggleButtonNotify.bind(this)} />
         <View className='page-title'>播放音符</View>
+        <View className='note-btns'>
+          <AtButton size='small' circle onClick={()=>this.onSendNote('do')}>Do</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote('re')}>Re</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote('mi')}>Mi</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote('fa')}>Fa</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote('so')}>So</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote('ra')}>Ra</AtButton>
+          <AtButton size='small' circle onClick={()=>this.onSendNote('xi')}>Xi</AtButton>
+        </View>
+        <View className='page-title'>读取陀螺仪</View>
+        <View className='page-item'>
+          <View className='imu-txt'>{`姿态: ${this.state.imuPos}`}</View>
+          <View className='imu-txt'>{`X:${this.state.imuX} Y:${this.state.imuY} Z:${this.state.imuZ}`}</View>
+        </View>
+        
       </View>
     )
   }

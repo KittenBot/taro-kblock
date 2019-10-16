@@ -19,6 +19,9 @@
 
   .page-item {
     padding: 40px;
+    .imu-txt {
+      font-size: 36px;
+    }
   }
 
   .led-wrap{
@@ -27,6 +30,13 @@
 
     .at-grid-item {
       background: black;
+    }
+  }
+
+  .note-btns {
+    .at-button {
+      display: inline-block;
+      margin-left: 2px;
     }
   }
 }
