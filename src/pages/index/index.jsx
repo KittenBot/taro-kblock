@@ -28,6 +28,11 @@ class Index extends Component {
         //   title: 'Iot',
         //   content: 'Iot 面板',
         // },
+        {
+          id: 'joystick',
+          title: 'Joystick',
+          content: '手柄模式',
+        },
       ],
       imgUrls: [
         'https://img10.360buyimg.com/babel/s700x360_jfs/t25855/203/725883724/96703/5a598a0f/5b7a22e1Nfd6ba344.jpg!q90!cc_350x180',

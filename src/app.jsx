@@ -20,6 +20,7 @@ class App extends Component {
       'pages/microbit/index',
       'pages/robotbit/index',
       'pages/bleconn/index',
+      'pages/joystick/index'
     ],
     window: {
       backgroundTextStyle: 'light',
