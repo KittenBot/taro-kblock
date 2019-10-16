@@ -2,7 +2,7 @@
   "miniprogramRoot": "./dist",
   "projectname": "taro-kblock",
   "description": "Taro app for kblock",
-  "appid": "touristappid",
+  "appid": "wx62be6ccb9ef78ca1",
   "setting": {
     "urlCheck": true,
     "es6": false,
