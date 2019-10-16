@@ -269,6 +269,7 @@ const pixelImage = {
 `
 };
 
+const btnEnum = ['None', 'A', 'B', 'A+B']
 
 function matStr2ary (mat){
   return mat.trim().replace(/\n/g, '').replace(/ /g, '').replace(/#/g, '1');
@@ -297,42 +298,54 @@ class MicroBitPage extends Taro.Component {
       images: Object.keys(pixelImage),
       matText: '',
       isButtonNotify: false,
-      gesture: '',
-      tiltX: 0,
-      tiltY: 0,
-      buttonA: 0,
-      buttonB: 0,
-      pin0: 0,
-      pin1: 0,
-      pin2: 0
+      btnValue: 0,
+      gesValue: 0,
+      touchValue: 0,
+      accX: 0,
+      accY: 0,
+      accZ: 0,
     }
     this.onSendNote = this.onSendNote.bind(this);
     this.bleWrite = this.bleWrite.bind(this);
     this.send = this.send.bind(this);
+
+    this.lineBuffer = '';
   }
 
   componentDidMount () { 
     Taro.onBLECharacteristicValueChange((characteristic) => {
+      // const v = new Uint8Array(characteristic.value);
       const v = new Uint8Array(characteristic.value);
-      var tiltX = v[1] | (v[0] << 8);
-      if (tiltX > (1 << 15)) tiltX -= (1 << 16);
+      const dataStr = String.fromCharCode.apply(null, v);
+      this.lineBuffer += dataStr;
+      if (this.lineBuffer.indexOf('\n') !== -1){
+        const lines = this.lineBuffer.split('\n')
+        this.lineBuffer = lines.pop();
+        for (const l of lines){
+          // console.log(">>", l);
+          if (l.startsWith('@')){
+            let tmp = l.trim().split(' ')
+            tmp = tmp.filter(n => n !== '');
+            const btnValue = parseInt(tmp[1], 10);
 
-      var tiltY = v[3] | (v[2] << 8);
-      if (tiltY > (1 << 15)) tiltY -= (1 << 16);
+            if (btnValue !== 0 && btnValue !== this.state.btnValue && this.state.isButtonNotify){
+              Taro.atMessage({
+                'message': `按键 ${btnEnum[btnValue]}按下`,
+                'type': 'info',
+              })
+            }
 
-      var buttonA = v[4];
-      var buttonB = v[5];
-
-      this.setState({
-        tiltX,
-        tiltY,
-        buttonA,
-        buttonB,
-        pin0: v[6],
-        pin1: v[7],
-        pin2: v[8],
-        gesture: v[9]
-      })
+            this.setState({
+              btnValue: btnValue,
+              gesValue: parseInt(tmp[2], 10),
+              touchValue: parseInt(tmp[3], 10),
+              accX: parseInt(tmp[4], 10),
+              accY: parseInt(tmp[5], 10),
+              accZ: parseInt(tmp[6], 10),
+            })
+          }
+        }
+      }
     })
 
     Taro.onBLEConnectionStateChange(res => {
@@ -349,10 +362,15 @@ class MicroBitPage extends Taro.Component {
   }
 
   componentWillUnmount () { 
-    // Taro.closeBLEConnection({
-    //   deviceId: app.globalData.deviceId
-    // })
-    // Taro.closeBluetoothAdapter()
+    if (this.props.ble.connected){
+      console.log("close ble", this.props.ble.connected.deviceId);
+      Taro.closeBLEConnection({
+        deviceId: this.props.ble.connected.deviceId
+      }).then(ret => {
+        this.props.bleConnected(null);
+        Taro.closeBluetoothAdapter()
+      })
+    }
   }
 
   bleWrite (str){
@@ -487,8 +505,8 @@ class MicroBitPage extends Taro.Component {
         </View>
         <View className='page-title'>读取陀螺仪</View>
         <View className='page-item'>
-          <View className='imu-txt'>{`姿态: ${this.state.gesture}`}</View>
-          <View className='imu-txt'>{`X:${this.state.tiltX} Y:${this.state.tiltY}`}</View>
+          <View className='imu-txt'>{`姿态: ${this.state.gesValue}`}</View>
+          <View className='imu-txt'>{`X:${this.state.accX} Y:${this.state.accY} Z:${this.state.accZ}`}</View>
         </View>
         
       </View>
