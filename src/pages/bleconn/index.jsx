@@ -18,6 +18,9 @@ import logoImg from '../../assets/images/kittenbot.png'
   setDevices (devices){
     dispatch(setDevices(devices))
   },
+  bleConnected (dev){
+    dispatch(bleConnected(dev))
+  },
   bleCharWrite (char){
     dispatch(bleCharWrite(char))
   },
@@ -82,25 +85,23 @@ class BleConn extends Taro.Component {
     const deviceId = dev.deviceId
 
     Taro.createBLEConnection({
-      deviceId,
-      success: (res) => {
-        this.props.bleConnected(dev);
-        this.getBLEDeviceServices(deviceId)
-      }
+      deviceId
+    }).then(ret => {
+      this.props.bleConnected(dev);
+      this.getBLEDeviceServices(deviceId)
     })
     this.stopBluetoothDevicesDiscovery()
   }
 
   getBLEDeviceServices(deviceId) {
     Taro.getBLEDeviceServices({
-      deviceId,
-      success: (res) => {
-        console.log('getBLEDeviceServices success', res.services)
-        for (let i = 0; i < res.services.length; i++) {
-          if (res.services[i].isPrimary) {
-            this.getBLEDeviceCharacteristics(deviceId, res.services[i].uuid)
-            return
-          }
+      deviceId
+    }).then(res => {
+      console.log('getBLEDeviceServices success', res.services)
+      for (let i = 0; i < res.services.length; i++) {
+        if (res.services[i].isPrimary) {
+          this.getBLEDeviceCharacteristics(deviceId, res.services[i].uuid)
+          return
         }
       }
     })
@@ -109,38 +110,36 @@ class BleConn extends Taro.Component {
   getBLEDeviceCharacteristics(deviceId, serviceId) {
     Taro.getBLEDeviceCharacteristics({
       deviceId,
-      serviceId,
-      success: (res) => {
-        console.log('getBLEDeviceCharacteristics success', res.characteristics)
-        for (let i = 0; i < res.characteristics.length; i++) {
-          let item = res.characteristics[i]
-          if (item.properties.read) {
-            Taro.readBLECharacteristicValue({
-              deviceId,
-              serviceId,
-              characteristicId: item.uuid,
-            })
-          }
-          if (item.properties.write) {
-            this.props.bleCharWrite({
-              deviceId,
-              serviceId,
-              characteristicId: item.uuid
-            });
-          }
-          if (item.properties.notify || item.properties.indicate) {
-            Taro.notifyBLECharacteristicValueChange({
-              deviceId,
-              serviceId,
-              characteristicId: item.uuid,
-              state: true,
-            })
-          }
+      serviceId
+    }).then(res => {
+      console.log('getBLEDeviceCharacteristics success', res.characteristics)
+      for (let i = 0; i < res.characteristics.length; i++) {
+        let item = res.characteristics[i]
+        if (item.properties.read) {
+          Taro.readBLECharacteristicValue({
+            deviceId,
+            serviceId,
+            characteristicId: item.uuid,
+          })
         }
-      },
-      fail(res) {
-        console.error('getBLEDeviceCharacteristics', res)
+        if (item.properties.write) {
+          this.props.bleCharWrite({
+            deviceId,
+            serviceId,
+            characteristicId: item.uuid
+          });
+        }
+        if (item.properties.notify || item.properties.indicate) {
+          Taro.notifyBLECharacteristicValueChange({
+            deviceId,
+            serviceId,
+            characteristicId: item.uuid,
+            state: true,
+          })
+        }
       }
+    }).catch(err => {
+      console.error('getBLEDeviceCharacteristics', res)
     })
     
   }
@@ -166,7 +165,7 @@ class BleConn extends Taro.Component {
           {
             Object.keys(devices).map((item, idx) => (
               <AtListItem title={devices[item].name} note={devices[item].deviceId} onClick={
-                () => this.onConnectBle(item)
+                () => this.onConnectBle(devices[item])
               } />
             ))
           }

@@ -329,14 +329,6 @@ class MicroBitPage extends Taro.Component {
         pin1: v[7],
         pin2: v[8],
         gesture: v[9]
-      }) 
-
-      // update ui
-      that.btnA.updateOption({
-        x: buttonA ? 10: -100
-      })
-      that.btnB.updateOption({
-        x: buttonB ? 210 : -100
       })
     })
   }
