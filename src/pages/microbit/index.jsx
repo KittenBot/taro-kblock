@@ -6,6 +6,272 @@ import { connect } from '@tarojs/redux'
 import './index.scss'
 import { bleScan } from '../../reducers/ble'
 
+import ledon from '../../assets/images/ledon.png'
+import ledoff from '../../assets/images/ledoff.png'
+
+
+const pixelImage = {
+  HEART: `
+. # . # .
+# # # # #
+# # # # #
+. # # # .
+. . # . .`,
+
+  HEART_SMALL: `
+. . . . .
+. # . # .
+. # # # .
+. . # . .
+. . . . .`,
+  // FACES
+  HAPPY: `
+. . . . .
+. # . # .
+. . . . .
+# . . . #
+. # # # .`,
+  SAD: `
+. . . . .
+. # . # .
+. . . . .
+. # # # .
+# . . . #`,
+  CONFUSED: `
+. . . . .
+. # . # .
+. . . . .
+. # . # .
+# . # . #`,
+  ANGRY: `
+# . . . #
+. # . # .
+. . . . .
+# # # # #
+# . # . #`,
+  ASLEEP: `
+. . . . .
+# # . # #
+. . . . .
+. # # # .
+. . . . .`,
+  SURPRISED: `
+. # . # .
+. . . . .
+. . # . .
+. # . # .
+. . # . .`,
+  SILLY: `
+# . . . #
+. . . . .
+# # # # #
+. . . # #
+. . . # #`,
+  FABULOUS: `
+# # # # #
+# # . # #
+. . . . .
+. # . # .
+. # # # .`,
+  MEH: `
+# # . # #
+. . . . .
+. . . # .
+. . # . .
+. # . . .`,
+  YES: `
+. . . . .
+. . . . #
+. . . # .
+# . # . .
+. # . . .`,
+  NO: `
+# . . . #
+. # . # .
+. . # . .
+. # . # .
+# . . . #`,
+  TRIANGLE: `
+. . . . .
+. . # . .
+. # . # .
+# # # # #
+. . . . .`,
+  LEFTTRIANGLE: `
+# . . . .
+# # . . .
+# . # . .
+# . . # .
+# # # # #`,
+  CHESSBOARD: `
+. # . # .
+# . # . #
+. # . # .
+# . # . #
+. # . # .`,
+  DIAMOND: `
+. . # . .
+. # . # .
+# . . . #
+. # . # .
+. . # . .`,
+  DIAMOND_SMALL: `
+. . . . .
+. . # . .
+. # . # .
+. . # . .
+. . . . .`,
+  SQUARE: `
+# # # # #
+# . . . #
+# . . . #
+# . . . #
+# # # # #`,
+  SQUARE_SMALL: `
+. . . . .
+. # # # .
+. # . # .
+. # # # .
+. . . . .`,
+
+  SCISSORS: `
+# # . . #
+# # . # .
+. . # . .
+# # . # .
+# # . . #`,
+  // THE FOLLOWING IMAGES WERE DESIGNED BY ABBIE BROOKS.
+  TSHIRT: `
+# # . # #
+# # # # #
+. # # # .
+. # # # .
+. # # # .`,
+  ROLLERSKATE: `
+. . . # #
+. . . # #
+# # # # #
+# # # # #
+. # . # .`,
+  DUCK: `
+. # # . .
+# # # . .
+. # # # #
+. # # # .
+. . . . .`,
+  HOUSE: `
+. . # . .
+. # # # .
+# # # # #
+. # # # .
+. # . # .`,
+  TORTOISE: `
+. . . . .
+. # # # .
+# # # # #
+. # . # .
+. . . . .`,
+  BUTTERFLY: `
+# # . # #
+# # # # #
+. . # . .
+# # # # #
+# # . # #`,
+  STICKFIGURE: `
+. . # . .
+# # # # #
+. . # . .
+. # . # .
+# . . . #`,
+  GHOST: `
+. # # # .
+# . # . #
+# # # # #
+# # # # #
+# . # . #`,
+  SWORD: `
+. . # . .
+. . # . .
+. . # . .
+. # # # .
+. . # . .`,
+  GIRAFFE: `
+# # . . .
+. # . . .
+. # . . .
+. # # # .
+. # . # .`,
+  SKULL: `
+. # # # .
+# . # . #
+# # # # #
+. # # # .
+. # # # .`,
+  UMBRELLA: `
+. # # # .
+# # # # #
+. . # . .
+# . # . .
+# # # . .`,
+  SNAKE: `
+# # . . .
+# # . # #
+. # . # .
+. # # # .
+. . . . .`,
+  // ANIMALS
+  RABBIT: `
+# . # . .
+# . # . .
+# # # # .
+# # . # .
+# # # # .`,
+  COW: `
+# . . . #
+# . . . #
+# # # # #
+. # # # .
+. . # . .`,
+  // MUSICAL NOTES
+  QUARTERNOTE: `
+. . # . .
+. . # . .
+. . # . .
+# # # . .
+# # # . .`,
+  EIGHTNOTE: `
+. . # . .
+. . # # .
+. . # . #
+# # # . .
+# # # . .`,
+  // OTHER ICONS
+  PITCHFORK: `
+# . # . #
+# . # . #
+# # # # #
+. . # . .
+. . # . .`,
+  TARGET: `
+. . # . .
+. # # # .
+# # . # #
+. # # # .
+. . # . .`,
+  DEFAULT: `
+. . . . .
+. . . . .
+. . . . .
+. . . . .
+. . . . .
+`
+};
+
+
+function matStr2ary (mat){
+  return mat.trim().replace(/\n/g, '').replace(/ /g, '').replace(/#/g, '1');
+}
+
 @connect(({ ble }) => ({
   ble
 }), (dispatch) => ({
@@ -22,32 +288,7 @@ class MicroBitPage extends Taro.Component {
   constructor (){
     super(...arguments)
     this.state = {
-      led: [
-        {
-          image:
-            'https://img12.360buyimg.com/jdphoto/s72x72_jfs/t6160/14/2008729947/2754/7d512a86/595c3aeeNa89ddf71.png',
-        },
-        {
-          image:
-            'https://img20.360buyimg.com/jdphoto/s72x72_jfs/t15151/308/1012305375/2300/536ee6ef/5a411466N040a074b.png',
-        },
-        {
-          image:
-            'https://img10.360buyimg.com/jdphoto/s72x72_jfs/t5872/209/5240187906/2872/8fa98cd/595c3b2aN4155b931.png',
-        },
-        {
-          image:
-            'https://img12.360buyimg.com/jdphoto/s72x72_jfs/t10660/330/203667368/1672/801735d7/59c85643N31e68303.png',
-        },
-        {
-          image:
-            'https://img14.360buyimg.com/jdphoto/s72x72_jfs/t17251/336/1311038817/3177/72595a07/5ac44618Na1db7b09.png',
-        },
-        {
-          image:
-            'https://img30.360buyimg.com/jdphoto/s72x72_jfs/t5770/97/5184449507/2423/294d5f95/595c3b4dNbc6bc95d.png',
-        }
-      ],
+      matrix: matStr2ary(pixelImage.HEART).split(''),
       images: ['hear', 'small-heart']
     }
   }
@@ -73,7 +314,24 @@ class MicroBitPage extends Taro.Component {
     })
   }
 
+  onLedToggle (e, idx){
+    const mat = this.state.matrix;
+    if (mat[idx] === '1'){
+      mat[idx] = '0';
+    } else {
+      mat[idx] = '1'
+    }
+    this.setState({matrix: mat})
+  }
+
   render () {
+    // map matrix str to at grid info
+    let gridInfo = [];
+    for (let m of this.state.matrix){
+      gridInfo.push(m == '1' ? {image: ledon} : {image: ledoff});
+    }
+    
+
     return (
       <View className='page'>
         <View className='page-item'>
@@ -87,7 +345,7 @@ class MicroBitPage extends Taro.Component {
         <View className='page-title'>矩阵屏幕:{this.props.ble.isScanning}</View>
         <View className='page-item'>
           <View className='led-wrap'>
-            <AtGrid columnNum={5} data={this.state.led} />
+            <AtGrid columnNum={5} data={gridInfo} onClick={this.onLedToggle.bind(this)} />
           </View>
         </View>
         <View className='page-title'>显示图案</View>
