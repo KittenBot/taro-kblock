@@ -1,7 +1,9 @@
 import Taro from '@tarojs/taro'
 import { View, Picker, PickerView, PickerViewColumn, Image } from '@tarojs/components'
-import { AtButton, AtGrid, AtInput, AtSwitch  } from 'taro-ui'
+import { AtButton, AtGrid, AtInput, AtSwitch, AtMessage } from 'taro-ui'
 import { connect } from '@tarojs/redux'
+
+import {str2ab} from '../../utils/util.js';
 
 import './index.scss'
 import { bleScan } from '../../reducers/ble'
@@ -292,18 +294,81 @@ class MicroBitPage extends Taro.Component {
       images: Object.keys(pixelImage),
       matText: '',
       isButtonNotify: false,
-      imuPos: '',
-      imuX: 0,
-      imuY: 0,
-      imuZ: 0
+      gesture: '',
+      tiltX: 0,
+      tiltY: 0,
+      buttonA: 0,
+      buttonB: 0,
+      pin0: 0,
+      pin1: 0,
+      pin2: 0
     }
     this.onSendNote = this.onSendNote.bind(this);
+    this.bleWrite = this.bleWrite.bind(this);
+    this.send = this.send.bind(this);
   }
 
-  handlePickerChange (e) {
-    this.setState({
-      selectorValue: e.detail.value
+  componentDidMount () { 
+    Taro.onBLECharacteristicValueChange((characteristic) => {
+      const v = new Uint8Array(characteristic.value);
+      var tiltX = v[1] | (v[0] << 8);
+      if (tiltX > (1 << 15)) tiltX -= (1 << 16);
+
+      var tiltY = v[3] | (v[2] << 8);
+      if (tiltY > (1 << 15)) tiltY -= (1 << 16);
+
+      var buttonA = v[4];
+      var buttonB = v[5];
+
+      this.setState({
+        tiltX,
+        tiltY,
+        buttonA,
+        buttonB,
+        pin0: v[6],
+        pin1: v[7],
+        pin2: v[8],
+        gesture: v[9]
+      }) 
+
+      // update ui
+      that.btnA.updateOption({
+        x: buttonA ? 10: -100
+      })
+      that.btnB.updateOption({
+        x: buttonB ? 210 : -100
+      })
     })
+  }
+
+  componentWillUnmount () { 
+    // Taro.closeBLEConnection({
+    //   deviceId: app.globalData.deviceId
+    // })
+    // Taro.closeBluetoothAdapter()
+  }
+
+  bleWrite (str){
+    console.log("ble write", str);
+    const data = str2ab(str);
+    const wc = this.props.ble.charWrite;
+    if (wc){
+      Taro.writeBLECharacteristicValue({
+        deviceId: wc.deviceId,
+        serviceId: wc.serviceId,
+        characteristicId: wc.characteristicId,
+        value: data
+      })
+    } else {
+      Taro.atMessage({
+        'message': '请先连接Microbit蓝牙',
+        'type': 'error',
+      })
+    }
+  }
+
+  send (data){
+    data.match(/(.|[\r\n]){1,20}/g).map(c => this.bleWrite(c));
   }
 
   onChangeMatText (value) {
@@ -328,19 +393,21 @@ class MicroBitPage extends Taro.Component {
       mat[idx] = '1'
     }
     this.setState({matrix: mat})
+    this.send(`M2 ${mat.join('')}\n`);
   }
 
   onPickLedImg (e){
     const idx = e.detail.value;
     const img = pixelImage[this.state.images[idx]];
+    const mat = matStr2ary(img).split('');
     this.setState({
-      matrix: matStr2ary(img).split(''),
+      matrix: mat,
     })
-
+    this.send(`M2 ${mat.join('')}\n`);
   }
 
   onSendText (){
-    console.log("send text", this.state.matText)
+    this.send(`M1 ${this.state.matText}\n`);
   }
 
   onToggleButtonNotify (){
@@ -363,6 +430,7 @@ class MicroBitPage extends Taro.Component {
 
     return (
       <View className='page'>
+        <AtMessage />
         <View className='page-item'>
           {this.props.ble.connected ? <View>
             已连接{this.props.ble.connected.name}
@@ -412,8 +480,8 @@ class MicroBitPage extends Taro.Component {
         </View>
         <View className='page-title'>读取陀螺仪</View>
         <View className='page-item'>
-          <View className='imu-txt'>{`姿态: ${this.state.imuPos}`}</View>
-          <View className='imu-txt'>{`X:${this.state.imuX} Y:${this.state.imuY} Z:${this.state.imuZ}`}</View>
+          <View className='imu-txt'>{`姿态: ${this.state.gesture}`}</View>
+          <View className='imu-txt'>{`X:${this.state.tiltX} Y:${this.state.tiltY}`}</View>
         </View>
         
       </View>
