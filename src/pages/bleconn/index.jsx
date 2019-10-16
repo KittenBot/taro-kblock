@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro'
 import { View, Text, PickerView, PickerViewColumn, Image } from '@tarojs/components'
-import { AtButton, AtList, AtListItem, AtActivityIndicator } from 'taro-ui'
+import { AtButton, AtList, AtListItem, AtActivityIndicator, AtMessage } from 'taro-ui'
 import { connect } from '@tarojs/redux'
 import { bleScan, setDevices, bleConnected, bleCharWrite, bleCharRead } from '../../reducers/ble'
 import './index.scss'
@@ -12,7 +12,6 @@ import logoImg from '../../assets/images/kittenbot.png'
   ble
 }), (dispatch) => ({
   bleScan (state) {
-    console.log("ble scan", state)
     dispatch(bleScan(state))
   },
   setDevices (devices){
@@ -43,6 +42,10 @@ class BleConn extends Taro.Component {
     this.onConnectBle = this.onConnectBle.bind(this);
     this.getBLEDeviceServices = this.getBLEDeviceServices.bind(this);
     this.startBluetoothDevicesDiscovery = this.startBluetoothDevicesDiscovery.bind(this);
+  }
+
+  componentWillUnmount (){
+    this.stopBluetoothDevicesDiscovery();
   }
 
   startBluetoothDevicesDiscovery (){
@@ -78,6 +81,7 @@ class BleConn extends Taro.Component {
 
   stopBluetoothDevicesDiscovery() {
     Taro.stopBluetoothDevicesDiscovery()
+    this.props.bleScan(false);
   }
 
   onConnectBle (dev){
@@ -138,6 +142,10 @@ class BleConn extends Taro.Component {
           })
         }
       }
+      Taro.atMessage({
+        'message': '蓝牙连接成功',
+        'type': 'success',
+      })
     }).catch(err => {
       console.error('getBLEDeviceCharacteristics', res)
     })
@@ -148,6 +156,7 @@ class BleConn extends Taro.Component {
     const devices = this.props.ble.devices;
     return (
       <View className="page">
+        <AtMessage />
         <View className="page-item">
           <Image src={logoImg} className='logo' mode='widthFix' />
         </View>
@@ -166,7 +175,7 @@ class BleConn extends Taro.Component {
             Object.keys(devices).map((item, idx) => (
               <AtListItem title={devices[item].name} note={devices[item].deviceId} onClick={
                 () => this.onConnectBle(devices[item])
-              } />
+              } extraText={devices[item].RSSI}/>
             ))
           }
         </AtList>

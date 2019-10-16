@@ -6,7 +6,7 @@ import { connect } from '@tarojs/redux'
 import {str2ab} from '../../utils/util.js';
 
 import './index.scss'
-import { bleScan } from '../../reducers/ble'
+import { bleScan, bleConnected } from '../../reducers/ble'
 
 import ledon from '../../assets/images/ledon.png'
 import ledoff from '../../assets/images/ledoff.png'
@@ -280,7 +280,10 @@ function matStr2ary (mat){
   bleScan (state) {
     console.log("ble scan", state)
     dispatch(bleScan(state))
-  }
+  },
+  bleConnected (dev){
+    dispatch(bleConnected(dev))
+  },
 }))
 class MicroBitPage extends Taro.Component {
   config = {
@@ -330,6 +333,18 @@ class MicroBitPage extends Taro.Component {
         pin2: v[8],
         gesture: v[9]
       })
+    })
+
+    Taro.onBLEConnectionStateChange(res => {
+      // 该方法回调中可以用于处理连接意外断开等异常情况
+      // console.log(`device ${res.deviceId} state has changed, connected: ${res.connected}`)
+      if (this.props.ble.connected && this.props.ble.connected.deviceId == res.deviceId && !res.connected){
+        Taro.atMessage({
+          'message': '蓝牙连接断开',
+          'type': 'warning',
+        })
+        this.props.bleConnected(null);
+      }
     })
   }
 

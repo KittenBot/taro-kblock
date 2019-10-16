@@ -7,11 +7,6 @@ const BLE_CHAR_READ = 'BLE_CHAR_READ'
 const INITIAL_STATE = {
   isScanning: false,
   devices: {
-    '12345': {
-      name: 'aaaa',
-      deviceId: '12335',
-      RSSI: -73
-    }
   },
   connected: null,
   charWrite: null,
@@ -68,7 +63,7 @@ const setDevices = (devices) => {
 const bleConnected = (dev) => {
   return {
     type: BLE_CONNECTED,
-    devices: dev
+    dev: dev
   }
 }
 
