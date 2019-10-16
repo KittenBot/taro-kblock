@@ -79,6 +79,31 @@ class BleConn extends Taro.Component {
     
   }
 
+  onDisconnect (){
+    if (this.props.ble.charRead){
+      const char = this.props.ble.charRead;
+      Taro.notifyBLECharacteristicValueChange({
+        deviceId: char.deviceId,
+        serviceId: char.serviceId,
+        characteristicId: char.characteristicId,
+        state: false,
+      }).then(ret => {
+        Taro.closeBLEConnection({
+          deviceId: this.props.ble.connected.deviceId
+        }).then(ret => {
+          this.props.bleConnected(null)
+        })
+      })
+    } else {
+      Taro.closeBLEConnection({
+        deviceId: this.props.ble.connected.deviceId
+      }).then(ret => {
+        this.props.bleConnected(null)
+      })
+    }
+
+  }
+
   stopBluetoothDevicesDiscovery() {
     Taro.stopBluetoothDevicesDiscovery()
     this.props.bleScan(false);
@@ -140,6 +165,11 @@ class BleConn extends Taro.Component {
             characteristicId: item.uuid,
             state: true,
           })
+          this.props.bleCharRead({
+            deviceId,
+            serviceId,
+            characteristicId: item.uuid
+          });
         }
       }
       Taro.atMessage({
@@ -164,8 +194,10 @@ class BleConn extends Taro.Component {
           <View className='page-title'>使用说明：请在kittenblock V1.84以上版本选择Microbit Python>BLE并恢复固件</View>
         </View>
         <View className="page-item">
-          {this.props.ble.isScanning ? <AtActivityIndicator content='扫描中...'/> : 
-          <AtButton type='primary' circle={true} size='normal' onClick={this.onStartScan.bind(this)}>扫描</AtButton>}
+          {this.props.ble.connected ?  
+          <AtButton className="btn-disconn" type='primary' circle={true} size='normal' onClick={this.onDisconnect.bind(this)}>断开连接</AtButton> :
+          <AtButton type='primary' circle={true} size='normal' loading={this.props.ble.isScanning } onClick={this.onStartScan.bind(this)}>扫描</AtButton> 
+          }
         </View>
         <View className="found-txt">
           已经发现{Object.keys(devices).length}个设备
