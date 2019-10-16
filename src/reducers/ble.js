@@ -6,12 +6,13 @@ const BLE_CHAR_READ = 'BLE_CHAR_READ'
 
 const INITIAL_STATE = {
   isScanning: false,
-  devices: [
-    {
-      name: "test",
-      uuid: 12345
+  devices: {
+    '12345': {
+      name: 'aaaa',
+      deviceId: '12335',
+      RSSI: -73
     }
-  ],
+  },
   connected: null,
   charWrite: null,
   charRead: null

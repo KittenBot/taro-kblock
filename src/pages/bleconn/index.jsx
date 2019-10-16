@@ -7,14 +7,6 @@ import './index.scss'
 
 import logoImg from '../../assets/images/kittenbot.png'
 
-function inArray(arr, key, val) {
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i][key] === val) {
-      return i;
-    }
-  }
-  return -1;
-}
 
 @connect(({ ble }) => ({
   ble
@@ -44,39 +36,41 @@ class BleConn extends Taro.Component {
     this.state = {
 
     }
-    this.onBluetoothDeviceFound = this.onBluetoothDeviceFound.bind(this);
+
     this.onConnectBle = this.onConnectBle.bind(this);
     this.getBLEDeviceServices = this.getBLEDeviceServices.bind(this);
+    this.startBluetoothDevicesDiscovery = this.startBluetoothDevicesDiscovery.bind(this);
+  }
+
+  startBluetoothDevicesDiscovery (){
+    Taro.startBluetoothDevicesDiscovery({
+      allowDuplicatesKey: true,
+    }).then(ret => {
+      this.props.bleScan(true);
+      console.log('startBluetoothDevicesDiscovery success', res)
+    })
+    Taro.onBluetoothDeviceFound((res) => {
+      console.log("onBluetoothDeviceFound", res);
+      const devices = this.props.ble.devices
+      res.devices.forEach(dev => {
+        if (!dev.name && !dev.localName) {
+          return
+        }
+        devices[dev.deviceId] = dev;
+      })
+      this.props.setDevices(devices)
+    })
   }
 
   onStartScan (){
-    Taro.startBluetoothDevicesDiscovery({
-      allowDuplicatesKey: true,
-      success: (res) => {
-        this.props.bleScan(true);
-        console.log('startBluetoothDevicesDiscovery success', res)
-        this.onBluetoothDeviceFound()
-      },
-    });
-  }
-
-  onBluetoothDeviceFound (){
-    Taro.onBluetoothDeviceFound((res) => {
-      res.devices.forEach(device => {
-        if (!device.name && !device.localName) {
-          return
-        }
-        const foundDevices = this.props.ble.devices
-        const idx = inArray(foundDevices, 'deviceId', device.deviceId)
-        const data = {}
-        if (idx === -1) {
-          data[`devices[${foundDevices.length}]`] = device
-        } else {
-          data[`devices[${idx}]`] = device
-        }
-        this.props.setDevices(data)
-      })
+    Taro.openBluetoothAdapter().then(ret => {
+      console.log('openBluetoothAdapter success', ret)
+      this.startBluetoothDevicesDiscovery()
+      
+    }).catch(err => {
+      console.log("openBluetoothAdapter err", err)
     })
+    
   }
 
   stopBluetoothDevicesDiscovery() {
@@ -152,6 +146,7 @@ class BleConn extends Taro.Component {
   }
 
   render (){
+    const devices = this.props.ble.devices;
     return (
       <View className="page">
         <View className="page-item">
@@ -165,12 +160,12 @@ class BleConn extends Taro.Component {
           <AtButton type='primary' circle={true} size='normal' onClick={this.onStartScan.bind(this)}>扫描</AtButton>}
         </View>
         <View className="found-txt">
-          已经发现{this.props.ble.devices.length}个设备
+          已经发现{Object.keys(devices).length}个设备
         </View>
         <AtList>
           {
-            this.props.ble.devices.map((item, idx) => (
-              <AtListItem title={item.name} note={item.uuid} onClick={
+            Object.keys(devices).map((item, idx) => (
+              <AtListItem title={devices[item].name} note={devices[item].deviceId} onClick={
                 () => this.onConnectBle(item)
               } />
             ))
