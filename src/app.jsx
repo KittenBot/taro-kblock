@@ -21,6 +21,7 @@ class App extends Component {
       'pages/robotbit/index',
       'pages/bleconn/index',
       'pages/iot/index',
+      'pages/joystick/index'
     ],
     window: {
       backgroundTextStyle: 'light',
