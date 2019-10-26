@@ -1,12 +1,10 @@
 import Taro from '@tarojs/taro'
-import { View, Picker, PickerView, PickerViewColumn, Image } from '@tarojs/components'
+import { View, Picker, PickerView, PickerViewColumn, Image,WebView } from '@tarojs/components'
 import { AtButton, AtGrid, AtInput, AtSwitch, AtMessage } from 'taro-ui'
 import { connect } from '@tarojs/redux'
 
 import './index.scss'
 import { bleScan, bleConnected } from '../../reducers/ble'
-
-import { WebView } from '@tarojs/components'
 
 
 @connect(({ ble }) => ({
@@ -133,7 +131,9 @@ class JoystickPage extends Taro.Component {
             onClick={this.handleGoBle.bind(this)}
           >{this.props.ble.connected ? `已连接${this.props.ble.connected.name}` : "请先连接蓝牙"}</View>
         </View>
-        <AtButton type='primary'>主操作按钮</AtButton>
+        <AtButton type='primary'>position: absolute;
+        transform: rotate(90deg);</AtButton>
+        
         
       </View>
     )

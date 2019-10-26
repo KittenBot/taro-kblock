@@ -33,6 +33,9 @@ const config = {
     }
   },
   weapp: {
+    compile: {
+      exclude: ['src/utils/mqtt.js']
+    },
     module: {
       postcss: {
         autoprefixer: {
