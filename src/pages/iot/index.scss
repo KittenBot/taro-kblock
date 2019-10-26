@@ -23,7 +23,50 @@
   }
 
   .page-item {
-    padding: 40px;
+    padding: 20px;
+    .ctl-forward {
+      width: 100px;
+      position: absolute;
+      left: 250px;
+      bottom: 250px;
+    }
+
+    .ctl-left {
+      width: 100px;
+      position: absolute;
+      left: 100px;
+      bottom: 100px;
+    }
+
+    .ctl-right {
+      width: 100px;
+      position: absolute;
+      left: 400px;
+      bottom: 100px;
+    }
+
+    .ctl-back {
+      width: 100px;
+      position: absolute;
+      left: 250px;
+      bottom: 100px;
+    }
+
+    .ctl-stop {
+      width: 100px;
+      position: absolute;
+      right: 100px;
+      bottom: 100px;
+    }
   }
+
+  .map-wrap {
+    padding: 10px;
+    .map {
+      height: 500px;
+    }
+  }
+
+
 
 }
