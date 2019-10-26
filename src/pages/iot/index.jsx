@@ -50,11 +50,18 @@ class IotPage extends Taro.Component {
       const msg = message.toString('utf-8');
       console.log(topic, msg);
       // this.mqttTopicData = message.toString('utf-8');
-      if (topic === '/meow'){
+      if (topic === '/oceanGps'){
         const n = msg.split(',').map(m => parseFloat(m.trim()))
         this.setState({
           latitude: n[0],
           longitude: n[1]
+        })
+      } else if (topic === '/oceanTemp'){
+        const n = msg.split(',').map(m => parseFloat(m.trim()))
+        this.setState({
+          temp: n[0],
+          tds: n[1],
+          dir: n[2]
         })
       }
     });
@@ -67,7 +74,8 @@ class IotPage extends Taro.Component {
     this.client.on('connect', connack => {
       this.props.iotSetClient(client);
       console.log("mqtt connected", connack);
-      this.client.subscribe('/meow', {qos: 1});
+      this.client.subscribe('/oceanTemp', {qos: 1});
+      this.client.subscribe('/oceanGps', {qos: 1});
       client.retryCnt = 0;
     });
     this.client.on('reconnect', () => {
@@ -88,8 +96,9 @@ class IotPage extends Taro.Component {
   }
 
   handleMove (dir){
-    console.log()
+    this.client.publish('/oceanShip', `${dir}`, {qos: 1, retain: false});
   }
+
 
   render (){
     return (
@@ -117,12 +126,16 @@ class IotPage extends Taro.Component {
           />
         </View>
         {this.props.iot.client ? <View className='page-item'>
-          <AtButton type='primary' circle={true} size='normal' onClick={this.onMqttTest.bind(this)}>采水样</AtButton>
-          <AtButton type='primary' className="ctl-forward" onClick={()=>this.handleMove('forward')}>前进</AtButton>
-          <AtButton type='primary' className="ctl-left" onClick={()=>this.handleMove('left')}>左转</AtButton>
-          <AtButton type='primary' className="ctl-right" onClick={()=>this.handleMove('right')}>右转</AtButton>
-          <AtButton type='primary' className="ctl-back" onClick={()=>this.handleMove('back')}>后退</AtButton>
-          <AtButton type='primary' className="ctl-stop" onClick={()=>this.handleMove('stop')}>停船</AtButton>
+          <View className="btn-item">
+            <AtButton type='primary' circle={true} onClick={()=>this.handleMove('11')}>采水样1</AtButton>
+            <AtButton type='primary' circle={true} onClick={()=>this.handleMove('12')}>采水样2</AtButton>
+            <AtButton type='primary' circle={true} onClick={()=>this.handleMove('13')}>采水样3</AtButton>
+          </View>
+          <AtButton type='primary' className="ctl-forward" onClick={()=>this.handleMove('1')}>前进</AtButton>
+          <AtButton type='primary' className="ctl-left" onClick={()=>this.handleMove('2')}>左转</AtButton>
+          <AtButton type='primary' className="ctl-right" onClick={()=>this.handleMove('3')}>右转</AtButton>
+          <AtButton type='primary' className="ctl-back" onClick={()=>this.handleMove('4')}>后退</AtButton>
+          <AtButton type='primary' className="ctl-stop" onClick={()=>this.handleMove('0')}>停船</AtButton>
         </View> : null}
       </View>
     )
