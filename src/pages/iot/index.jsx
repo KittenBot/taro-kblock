@@ -42,7 +42,7 @@ class IotPage extends Taro.Component {
 
   onConnect (e){
     const client = mqtt.connect(this.state.mqttServer, {
-      port: 8084
+      // port: 8084
     })
     this.client = client;
     console.log(this.client)
