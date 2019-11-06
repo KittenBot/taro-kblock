@@ -19,7 +19,6 @@
 
   .page-item {
     padding: 40px;
-
   }
 
   .joy-back {
@@ -30,11 +29,49 @@
     left: 50px;
   }
 
-  .btn-test {
+  .joy-txt {
     position: absolute;
     transform: rotate(90deg);
-    bottom: 50px;
-    left: 50px;
+    top: 250px;
+    right: 50px;
+  }
+
+  .btn-toggle {
+    position: absolute;
+    top: 40vh;
+    right: 50px;
+  }
+
+  .btn-a {
+    position: absolute;
+    transform: rotate(90deg);
+    bottom: 300px;
+    left: 300px;
+  }
+
+  .btn-b {
+    position: absolute;
+    transform: rotate(90deg);
+    bottom: 150px;
+    left: 300px;
+  }
+
+  .btn-c {
+    position: absolute;
+    transform: rotate(90deg);
+    bottom: 300px;
+    left: 150px;
+  }
+
+  .btn-d {
+    position: absolute;
+    transform: rotate(90deg);
+    bottom: 150px;
+    left: 150px;
+  }
+
+  .btn-editor {
+    margin-top: 40vh;
   }
 
 

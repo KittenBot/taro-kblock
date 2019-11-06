@@ -28,10 +28,19 @@ class JoystickPage extends Taro.Component {
   constructor (){
     super(...arguments)
     this.state = {
+      showEdit: true,
       joyWidth: 165,
       joyHeight: 165,
       joyLeft: 27,
       joyTop: 110,
+      btnACmd: 'M10 100',
+      btnBCmd: 'M10 -100',
+      btnCCmd: 'M22 100',
+      btnDCmd: 'M23 -100',
+      jx: 0,
+      jy: 0,
+      jdeg: 0,
+      jvalue: 0
     }
 
     this.mapTouch2XY = this.mapTouch2XY.bind(this);
@@ -165,24 +174,46 @@ class JoystickPage extends Taro.Component {
       deg+=360
     }
 
-    let value = Math.sqrt(x*x+y*y)/this.state.joyWidth*2;
-    if (value > 1) value = 1.0;
-    return {x, y, deg, value}
+    let value = Math.sqrt(x*x+y*y)/this.state.joyWidth*2 * 100;
+    if (value > 100) value = 100.0;
+    return {x:Math.round(x), y:Math.round(y), deg:Math.round(deg), value:Math.round(value)}
   }
 
   handleJoyStart (e){
-    console.log('start', this.mapTouch2XY(e))
+    const pos = this.mapTouch2XY(e);
+    this.setState({
+      jx: pos.x,
+      jy: pos.y,
+      jdeg: pos.deg,
+      jvalue: pos.value
+    })
   }
 
   handleJoyMove (e){
     if (Date.now() - this.lastMove > 100){
-      console.log(this.mapTouch2XY(e))
+      const pos = this.mapTouch2XY(e);
+      this.setState({
+        jx: pos.x,
+        jy: pos.y,
+        jdeg: pos.deg,
+        jvalue: pos.value
+      })
       this.lastMove = Date.now();
     }
   }
 
   handleJoyEnd (e){
     console.log('end', e)
+  }
+
+  handleInput (e, type){
+    this.setState({
+      [e]:type
+    })
+  }
+
+  handleBtn (e){
+    console.log("btn pressed", e);
   }
 
   render () {
@@ -195,7 +226,7 @@ class JoystickPage extends Taro.Component {
             onClick={this.handleGoBle.bind(this)}
           >{this.props.ble.connected ? `已连接${this.props.ble.connected.name}` : "请先连接蓝牙"}</View>
         </View>
-        <AtButton className='btn-test' type='primary'>test</AtButton>
+        
         <Image 
           src={logoImg} className='joy-back' mode='widthFix' 
           ref="joyback"
@@ -203,6 +234,19 @@ class JoystickPage extends Taro.Component {
           onTouchStart={this.handleJoyStart}
           onTouchEnd={this.handleJoyEnd}
         />
+        <View className='joy-txt'>{`摇杆 x:${this.state.jx} y:${this.state.jy} deg:${this.state.jdeg} value:${this.state.jvalue}`}</View>
+        <AtButton className='btn-toggle' type='primary' onClick={()=>this.setState({showEdit: !this.state.showEdit})}><View className='at-icon at-icon-edit'></View></AtButton>
+        {!this.state.showEdit ? <View>
+          <AtButton className='btn-a' type='primary' onClick={this.handleBtn.bind(this, 'btnACmd')}>A</AtButton>
+          <AtButton className='btn-b' type='primary' onClick={this.handleBtn.bind(this, 'btnBCmd')}>B</AtButton>
+          <AtButton className='btn-c' type='primary' onClick={this.handleBtn.bind(this, 'btnCCmd')}>C</AtButton>
+          <AtButton className='btn-d' type='primary' onClick={this.handleBtn.bind(this, 'btnDCmd')}>D</AtButton>
+        </View> : <View className='btn-editor'>
+          <AtInput title='按键A指令' type='text' value={this.state.btnACmd} onChange={this.handleInput.bind(this, 'btnACmd')} />
+          <AtInput title='按键B指令' type='text' value={this.state.btnBCmd} onChange={this.handleInput.bind(this, 'btnBCmd')} />
+          <AtInput title='按键C指令' type='text' value={this.state.btnCCmd} onChange={this.handleInput.bind(this, 'btnCCmd')} />
+          <AtInput title='按键D指令' type='text' value={this.state.btnDCmd} onChange={this.handleInput.bind(this, 'btnDCmd')} />
+        </View>}
         
       </View>
     )
