@@ -6,6 +6,8 @@ import { connect } from '@tarojs/redux'
 import './index.scss'
 import { bleScan, bleConnected } from '../../reducers/ble'
 
+import logoImg from '../../assets/images/joystick_back.png'
+
 
 @connect(({ ble }) => ({
   ble
@@ -26,8 +28,13 @@ class JoystickPage extends Taro.Component {
   constructor (){
     super(...arguments)
     this.state = {
-
+      joyWidth: 165,
+      joyHeight: 165,
+      joyLeft: 27,
+      joyTop: 110,
     }
+
+    this.mapTouch2XY = this.mapTouch2XY.bind(this);
 
   }
 
@@ -78,6 +85,20 @@ class JoystickPage extends Taro.Component {
         this.props.bleConnected(null);
       }
     })
+
+    const query = Taro.createSelectorQuery().in(this.$scope)
+    query.select('.joy-back').boundingClientRect().exec(res => {
+        // console.log('==json==================');
+        // console.log('res\n');
+        // console.log(JSON.stringify(res, null, '\t'));
+        // console.log('========================');
+        this.setState({
+          joyLeft: res[0].left,
+          joyTop: res[0].top,
+          joyWidth: res[0].width,
+          joyHeight: res[0].height,
+        })
+    })
   }
 
   componentWillUnmount () { 
@@ -121,6 +142,46 @@ class JoystickPage extends Taro.Component {
     })
   }
 
+  mapTouch2XY (e){
+    // rotate 90
+    
+    let midx = this.state.joyHeight/2+this.state.joyTop;
+    let midy = this.state.joyWidth/2+this.state.joyLeft;
+    let x = e.touches[0].clientY - midx;
+    let y = e.touches[0].clientX - midy;
+    if (x < -this.state.joyHeight/2){
+      x = -this.state.joyHeight/2;
+    } else if (x > this.state.joyHeight/2){
+      x = this.state.joyHeight/2;
+    }
+    if (y < -this.state.joyWidth/2){
+      y = -this.state.joyWidth/2;
+    } else if (y > this.state.joyWidth/2){
+      y = this.state.joyWidth/2;
+    }
+    let deg = Math.atan2(x, y); // match to flutter control pad
+    deg = deg/Math.PI*180;
+    if (deg<0){
+      deg+=360
+    }
+
+    let value = Math.sqrt(x*x+y*y)/this.state.joyWidth/2;
+
+    return {x, y, deg, value}
+  }
+
+  handleJoyStart (e){
+    console.log('start', this.mapTouch2XY(e))
+  }
+
+  handleJoyMove (e){
+    console.log(this.mapTouch2XY(e))
+  }
+
+  handleJoyEnd (e){
+    console.log('end', e)
+  }
+
   render () {
     return (
       <View className='page'>
@@ -131,9 +192,14 @@ class JoystickPage extends Taro.Component {
             onClick={this.handleGoBle.bind(this)}
           >{this.props.ble.connected ? `已连接${this.props.ble.connected.name}` : "请先连接蓝牙"}</View>
         </View>
-        <AtButton type='primary'>position: absolute;
-        transform: rotate(90deg);</AtButton>
-        
+        <AtButton className='btn-test' type='primary'>test</AtButton>
+        <Image 
+          src={logoImg} className='joy-back' mode='widthFix' 
+          ref="joyback"
+          onTouchMove={this.handleJoyMove}
+          onTouchStart={this.handleJoyStart}
+          onTouchEnd={this.handleJoyEnd}
+        />
         
       </View>
     )
