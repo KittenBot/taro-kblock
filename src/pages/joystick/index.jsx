@@ -85,7 +85,7 @@ class JoystickPage extends Taro.Component {
         this.props.bleConnected(null);
       }
     })
-
+    this.lastMove = Date.now();
     const query = Taro.createSelectorQuery().in(this.$scope)
     query.select('.joy-back').boundingClientRect().exec(res => {
         // console.log('==json==================');
@@ -165,8 +165,8 @@ class JoystickPage extends Taro.Component {
       deg+=360
     }
 
-    let value = Math.sqrt(x*x+y*y)/this.state.joyWidth/2;
-
+    let value = Math.sqrt(x*x+y*y)/this.state.joyWidth*2;
+    if (value > 1) value = 1.0;
     return {x, y, deg, value}
   }
 
@@ -175,7 +175,10 @@ class JoystickPage extends Taro.Component {
   }
 
   handleJoyMove (e){
-    console.log(this.mapTouch2XY(e))
+    if (Date.now() - this.lastMove > 100){
+      console.log(this.mapTouch2XY(e))
+      this.lastMove = Date.now();
+    }
   }
 
   handleJoyEnd (e){
