@@ -5,6 +5,7 @@ import { connect } from '@tarojs/redux'
 
 import './index.scss'
 import { bleScan, bleConnected } from '../../reducers/ble'
+import {str2ab} from '../../utils/util.js';
 
 import logoImg from '../../assets/images/joystick_back.png'
 
@@ -33,10 +34,10 @@ class JoystickPage extends Taro.Component {
       joyHeight: 165,
       joyLeft: 27,
       joyTop: 110,
-      btnACmd: 'M10 100',
-      btnBCmd: 'M10 -100',
-      btnCCmd: 'M22 100',
-      btnDCmd: 'M23 -100',
+      btnACmd: 'M11 300 500',
+      btnBCmd: 'M1 hello world',
+      btnCCmd: 'M31 -1 0 100 200',
+      btnDCmd: 'M24 0 90',
       jx: 0,
       jy: 0,
       jdeg: 0,
@@ -187,6 +188,8 @@ class JoystickPage extends Taro.Component {
       jdeg: pos.deg,
       jvalue: pos.value
     })
+    this.send(`M40 ${pos.deg} ${pos.value} 0\n`);
+    this.lastMove = Date.now();
   }
 
   handleJoyMove (e){
@@ -199,11 +202,12 @@ class JoystickPage extends Taro.Component {
         jvalue: pos.value
       })
       this.lastMove = Date.now();
+      this.send(`M40 ${pos.deg} ${pos.value} 0\n`);
     }
   }
 
   handleJoyEnd (e){
-    console.log('end', e)
+    this.send(`M40 0 0 0\n`);
   }
 
   handleInput (e, type){
@@ -213,7 +217,8 @@ class JoystickPage extends Taro.Component {
   }
 
   handleBtn (e){
-    console.log("btn pressed", e);
+    let cmd = `${this.state[e]}\n`;
+    this.send(cmd)
   }
 
   render () {

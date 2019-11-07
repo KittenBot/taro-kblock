@@ -191,7 +191,7 @@ class BleConn extends Taro.Component {
           <Image src={logoImg} className='logo' mode='widthFix' />
         </View>
         <View className="page-item">
-          <View className='page-title'>使用说明：请在kittenblock V1.84以上版本选择Microbit Python>BLE并恢复固件</View>
+          <View className='page-title'>使用说明：请在kittenblock V1.84以上版本选择Microbit(Powerbrick)>BLE并恢复固件</View>
         </View>
         <View className="page-item">
           {this.props.ble.connected ?  
