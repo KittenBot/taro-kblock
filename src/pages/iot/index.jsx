@@ -3,7 +3,9 @@ import { View, Text, PickerView, PickerViewColumn, Map } from '@tarojs/component
 import { AtButton, AtList, AtListItem, AtActivityIndicator, AtMessage, AtInput, AtForm } from 'taro-ui'
 import { connect } from '@tarojs/redux'
 import { iotSetClient } from '../../reducers/iot'
-import mqtt from '../../utils/mqtt.js';
+// import mqtt from '../../utils/mqtt.js';
+import mqtt from '../../utils/mqtt.min.js';
+
 import locImg from '../../assets/images/ship.png'
 
 import './index.scss'
@@ -47,9 +49,12 @@ class IotPage extends Taro.Component {
 
   onConnect (e){
     const client = mqtt.connect(this.state.mqttServer, {
-      // port: 8084
+      // port: 8084,
+      keepalive: 60, //60s
+      clean: true, //cleanSession不保持持久会话
     })
     this.client = client;
+    client.retryCnt = 0;
     console.log(this.client)
     this.client.on('message', (topic, message) => {
       const msg = message.toString('utf-8');
@@ -74,10 +79,34 @@ class IotPage extends Taro.Component {
     });
     this.client.on('reconnect', () => {
         client.retryCnt++;
-        if (client.retryCnt > 5){
+        if (client.retryCnt > 4){
             client.end();
         }
     });
+  }
+
+  handleTest (){
+    Taro.connectSocket({
+      url: 'wss://iot.kittenbot.cn/ws',
+      success: function () {
+        console.log('connect success')
+      }
+    }).then(task => {
+      task.onOpen(function () {
+        console.log('onOpen')
+        task.send({ data: 'xxx' })
+      })
+      task.onMessage(function (msg) {
+        console.log('onMessage: ', msg)
+        task.close()
+      })
+      task.onError(function () {
+        console.log('onError')
+      })
+      task.onClose(function (e) {
+        console.log('onClose: ', e)
+      })
+    })
   }
 
   onMqttTest (){
@@ -112,6 +141,7 @@ class IotPage extends Taro.Component {
           <AtInput name='mqttUser' title='用户名' type='text' placeholder='用户名,话题没设置则留空' value={this.state.mqttUser} onChange={this.handleInput.bind(this, 'mqttUser')} />
           <AtInput name='mqttPass' title='密码' type='text' placeholder='话题密码,话题没设置则留空' value={this.state.mqttPass} onChange={this.handleInput.bind(this, 'mqttPass')} />
           <AtButton type='primary' circle={true} size='normal' onClick={this.onConnect.bind(this)}>连接</AtButton>
+          <AtButton type='primary' circle={true} size='normal' onClick={this.handleTest.bind(this)}>test aliyun</AtButton>
         </AtForm>}
         
         {this.props.iot.client ? <View className='page-item'>
